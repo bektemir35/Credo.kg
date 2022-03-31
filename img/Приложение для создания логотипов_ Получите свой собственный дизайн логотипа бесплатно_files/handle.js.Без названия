@@ -1,0 +1,33 @@
+function parseUTM()
+{
+    var urlSearchParams = new URLSearchParams(window.location.search);
+    var params = Object.fromEntries(urlSearchParams.entries());
+
+    if (typeof INDOLEADS_COOKIES_LIFETIME === 'undefined' || INDOLEADS_COOKIES_LIFETIME === 0 || INDOLEADS_COOKIES_LIFETIME === null) {
+        INDOLEADS_COOKIES_LIFETIME = 6 * 30 * 24 * 60 * 60;
+    } else {
+        INDOLEADS_COOKIES_LIFETIME = INDOLEADS_COOKIES_LIFETIME * 24 * 60 * 60;
+    }
+
+    // if provided custom param name then use it to find click_id
+    if (typeof INDOLEADS_CLICK_PARAM !== 'undefined' && params[INDOLEADS_CLICK_PARAM] && isUUID(params[INDOLEADS_CLICK_PARAM])) {
+        setCookie(params[INDOLEADS_CLICK_PARAM], INDOLEADS_COOKIES_LIFETIME)
+    } else if (params.utm_term === 'indoleads' && isUUID(params.utm_content)) {
+        setCookie(params.utm_content, INDOLEADS_COOKIES_LIFETIME)
+    }
+}
+
+function setCookie(clickID, maxAge)
+{
+    document.cookie = 'indoleads_click=' + clickID + '; max-age=' + maxAge;
+}
+
+function isUUID(str)
+{
+    var s = '' + str;
+    s = s.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i);
+
+    return s !== null;
+}
+
+parseUTM();
